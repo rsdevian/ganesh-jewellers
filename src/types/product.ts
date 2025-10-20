@@ -5,6 +5,6 @@ export type Product = {
     description: string;
     price: number;
     imageUrl?: string; // optional field for product image
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
 };
