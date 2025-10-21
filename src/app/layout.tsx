@@ -26,7 +26,7 @@ export default function RootLayout({
             label: "Contact",
             href: "/contact",
         },
-        { label: "Login", href: "/login" },
+        { label: "My Account", href: "/login" },
     ];
 
     useEffect(() => {
