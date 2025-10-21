@@ -1,103 +1,108 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
+    const heroRef = useRef(null);
+    const showcaseRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        // Hero fade-in + slight zoom
+        gsap.fromTo(
+            heroRef.current,
+            { opacity: 0, scale: 0.95 },
+            { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }
+        );
+
+        // Jewel cards slide up on scroll
+        if (showcaseRef.current) {
+            gsap.fromTo(
+                showcaseRef.current.querySelectorAll(".jewel-card"),
+                { y: 100, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    stagger: 0.3,
+                    scrollTrigger: {
+                        trigger: showcaseRef.current,
+                        start: "top 80%",
+                    },
+                    duration: 1,
+                    ease: "power3.out",
+                }
+            );
+        }
+    }, []);
+
     return (
-        <div className='font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20'>
-            <main className='flex flex-col gap-[32px] row-start-2 items-center sm:items-start'>
+        <div className='font-sans bg-gradient-to-b from-[#fffaf5] to-[#f3e3d3] text-[#3a2c27] min-h-screen'>
+            {/* Hero Section */}
+            <section
+                ref={heroRef}
+                className='flex flex-col items-center justify-center text-center py-28 px-6'
+            >
+                <h1 className='text-5xl sm:text-6xl font-serif font-bold mb-4 tracking-tight'>
+                    Ganesh Jewellers
+                </h1>
+                <p className='max-w-xl text-lg sm:text-xl text-[#4a3b34] leading-relaxed'>
+                    Crafting timeless elegance — each piece a whisper of
+                    artistry and devotion.
+                </p>
                 <Image
-                    className='dark:invert'
-                    src='/next.svg'
-                    alt='Next.js logo'
-                    width={180}
-                    height={38}
+                    src='/demo/hero-real-jewel1.jpg'
+                    alt='Luxury jewellery display'
+                    width={300}
+                    height={300}
+                    className='mt-10 rounded-2xl shadow-lg'
                     priority
                 />
-                <ol className='font-mono list-inside list-decimal text-sm/6 text-center sm:text-left'>
-                    <li className='mb-2 tracking-[-.01em]'>
-                        Get started by editing{" "}
-                        <code className='bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded'>
-                            src/app/page.tsx
-                        </code>
-                        .
-                    </li>
-                    <li className='tracking-[-.01em]'>
-                        Save and see your changes instantly.
-                    </li>
-                </ol>
+            </section>
 
-                <div className='flex gap-4 items-center flex-col sm:flex-row'>
-                    <a
-                        className='rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto'
-                        href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-                        target='_blank'
-                        rel='noopener noreferrer'
+            {/* Showcase Section */}
+            <section
+                ref={showcaseRef}
+                className='grid sm:grid-cols-3 gap-8 px-8 sm:px-16 py-24 bg-white/70 backdrop-blur-sm'
+            >
+                {[
+                    {
+                        src: "/demo/necklace-real.jpg",
+                        title: "The Eternal Glow",
+                        desc: "Handcrafted gold necklace with intricate leaf motifs.",
+                    },
+                    {
+                        src: "/demo/ring-real.jpg",
+                        title: "Celestial Ring",
+                        desc: "Diamond-studded ring inspired by the night sky.",
+                    },
+                    {
+                        src: "/demo/earrings-real.jpg",
+                        title: "Whispering Drops",
+                        desc: "Elegant earrings that dance with every light.",
+                    },
+                ].map((item, idx) => (
+                    <div
+                        key={idx}
+                        className='jewel-card bg-[#fef9f5] border border-[#e8dcd1] rounded-2xl p-6 shadow-md text-center hover:shadow-xl transition-shadow'
                     >
                         <Image
-                            className='dark:invert'
-                            src='/vercel.svg'
-                            alt='Vercel logomark'
-                            width={20}
-                            height={20}
+                            src={item.src}
+                            alt={item.title}
+                            width={250}
+                            height={250}
+                            className='mx-auto mb-4 rounded-lg'
                         />
-                        Deploy now
-                    </a>
-                    <a
-                        className='rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]'
-                        href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-                        target='_blank'
-                        rel='noopener noreferrer'
-                    >
-                        Read our docs
-                    </a>
-                </div>
-            </main>
-            <footer className='row-start-3 flex gap-[24px] flex-wrap items-center justify-center'>
-                <a
-                    className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-                    href='https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <Image
-                        aria-hidden
-                        src='/file.svg'
-                        alt='File icon'
-                        width={16}
-                        height={16}
-                    />
-                    Learn
-                </a>
-                <a
-                    className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-                    href='https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <Image
-                        aria-hidden
-                        src='/window.svg'
-                        alt='Window icon'
-                        width={16}
-                        height={16}
-                    />
-                    Examples
-                </a>
-                <a
-                    className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-                    href='https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-                    target='_blank'
-                    rel='noopener noreferrer'
-                >
-                    <Image
-                        aria-hidden
-                        src='/globe.svg'
-                        alt='Globe icon'
-                        width={16}
-                        height={16}
-                    />
-                    Go to nextjs.org →
-                </a>
-            </footer>
+                        <h2 className='text-xl font-semibold font-serif mb-2'>
+                            {item.title}
+                        </h2>
+                        <p className='text-sm text-[#5b4b43]'>{item.desc}</p>
+                    </div>
+                ))}
+            </section>
         </div>
     );
 }
