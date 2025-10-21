@@ -2,27 +2,41 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { baseURL } from "@/utils/url";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const setUserDetails = (details: any) => {
+        const userDetails = { ...details, loggedIn: true };
+        delete userDetails.message;
+
+        localStorage.setItem(
+            "uxsxexrxDxextxaxixlxsx",
+            JSON.stringify(userDetails)
+        );
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const response = await axios.post(`${baseURL}/api/login`, {
+            const response = await axios.post(`/api/login`, {
                 email,
                 password,
             });
-
+            console.log(response);
             if (response.status >= 400) {
                 alert("Login failed");
             }
 
-            console.log("Login response:", response.data);
+            const userDetails = response.data;
+
+            userDetails && setUserDetails(userDetails);
+            router.push("/account");
         } catch (error) {
             console.log("Login error:", error);
             alert("Something went wrong. Please try again.");

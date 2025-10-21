@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { baseURL } from "@/utils/url";
+import { useRouter } from "next/navigation";
 
 const RegisterPage = () => {
     const [name, setName] = useState("");
@@ -10,6 +10,8 @@ const RegisterPage = () => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const navigate = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -21,10 +23,17 @@ const RegisterPage = () => {
         setLoading(true);
         try {
             // Example: call your register endpoint (uncomment if you have an API)
-            // const res = await axios.post(`${baseURL}/api/register`, { name, email, password });
+            const res = await axios.post(`/api/register`, {
+                name,
+                email,
+                password,
+            });
+
+            console.log(res.data);
+            navigate.push("/login");
             // handle res...
-            await new Promise((r) => setTimeout(r, 800)); // fake delay for demo
-            alert(`Registered: ${name} (${email})`);
+            // await new Promise((r) => setTimeout(r, 800)); // fake delay for demo
+            // alert(`Registered: ${name} (${email})`);
         } catch (err) {
             console.error("Register error:", err);
             alert("Registration failed — try again.");
