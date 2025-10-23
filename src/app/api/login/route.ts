@@ -2,11 +2,7 @@ import { query } from "@/utils/db";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
-import { config } from "dotenv";
-
 const response = NextResponse;
-
-config();
 
 export async function POST(request: Request) {
     const body = await request.json();
