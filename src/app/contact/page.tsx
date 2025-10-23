@@ -1,7 +1,7 @@
-// src/app/contact/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
 export default function ContactPage() {
     const [name, setName] = useState("");
@@ -10,6 +10,47 @@ export default function ContactPage() {
     const [status, setStatus] = useState<
         null | "idle" | "sending" | "sent" | "error"
     >(null);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Start everything invisible (prevents flicker)
+            gsap.set([headerRef.current, formRef.current], {
+                opacity: 0,
+                y: 40,
+            });
+
+            const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+            tl.to(headerRef.current, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+            })
+                .to(
+                    formRef.current,
+                    { opacity: 1, y: 0, duration: 0.9 },
+                    "-=0.4"
+                )
+                .from(
+                    formRef.current?.querySelectorAll(
+                        "input, textarea, button"
+                    ) || [],
+                    {
+                        opacity: 0,
+                        y: 20,
+                        stagger: 0.1,
+                        duration: 0.6,
+                    },
+                    "-=0.3"
+                );
+        }, containerRef);
+
+        return () => ctx.revert();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,9 +78,12 @@ export default function ContactPage() {
     };
 
     return (
-        <section className='min-h-screen px-6 py-20 bg-[#fffaf5] text-[#3a2c27]'>
+        <section
+            ref={containerRef}
+            className='min-h-screen px-6 py-20 bg-[#fffaf5] text-[#3a2c27]'
+        >
             <div className='max-w-3xl mx-auto'>
-                <header className='text-center mb-10'>
+                <header ref={headerRef} className='text-center mb-10'>
                     <h1 className='text-3xl sm:text-4xl font-serif text-[#bfa883] font-bold'>
                         Get in touch
                     </h1>
@@ -50,7 +94,11 @@ export default function ContactPage() {
                 </header>
 
                 <div className='bg-white/95 backdrop-blur-md p-8 rounded-2xl border border-[#e8dcd1] shadow-lg'>
-                    <form onSubmit={handleSubmit} className='space-y-5'>
+                    <form
+                        ref={formRef}
+                        onSubmit={handleSubmit}
+                        className='space-y-5'
+                    >
                         <div>
                             <label className='block text-sm font-medium text-[#5b4b43]'>
                                 Name
