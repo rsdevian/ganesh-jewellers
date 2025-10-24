@@ -3,7 +3,8 @@ import pkg from "pg";
 const { Pool } = pkg;
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL, // Supabase provides this
+    connectionString:
+        "postgresql://postgres:SRYfLtvxPuyxL8wy@db.tjtsirrwnbfhclegsisv.supabase.co:5432/postgres", // Supabase provides this
     ssl: {
         rejectUnauthorized: false, // Required for Supabase hosted PG
     },
