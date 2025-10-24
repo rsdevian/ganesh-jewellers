@@ -82,3 +82,5 @@ out/
 *.crt
 
 url.txt
+.vercel
+.env*.local
