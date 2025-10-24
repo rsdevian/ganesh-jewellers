@@ -14,7 +14,8 @@ export default function RootLayout({
 }) {
     const addressRef = useRef(null);
     const navRef = useRef<HTMLElement>(null);
-    const [hasAnimated, setHasAnimated] = useState(false); // <-- key flag
+    const mobileNavRef = useRef<HTMLDivElement>(null);
+    const [hasAnimated, setHasAnimated] = useState(false);
 
     const navs = [
         { label: "Home", href: "/" },
@@ -23,13 +24,38 @@ export default function RootLayout({
         { label: "My Account", href: "/login" },
     ];
 
+    // 🔹 Sidebar open/close animation
     useEffect(() => {
-        // 👇 Only animate once globally
+        const menu = mobileNavRef.current;
+        if (!menu) return;
+
+        const openMenu = () => {
+            gsap.to(menu, { x: 0, duration: 0.6, ease: "power3.out" });
+        };
+        const closeMenu = () => {
+            gsap.to(menu, { x: "100%", duration: 0.6, ease: "power3.in" });
+        };
+
+        const toggleMenu = () => {
+            if (document.body.classList.contains("menu-open")) openMenu();
+            else closeMenu();
+        };
+
+        const observer = new MutationObserver(toggleMenu);
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    // 🔹 Initial page load animation (only once)
+    useEffect(() => {
         if (hasAnimated) return;
         setHasAnimated(true);
 
         const ctx = gsap.context(() => {
-            // Animate navbar items (only once)
             if (navRef.current) {
                 gsap.fromTo(
                     navRef.current.querySelectorAll("a"),
@@ -44,7 +70,6 @@ export default function RootLayout({
                 );
             }
 
-            // Animate address block (when scrolled into view)
             if (addressRef.current) {
                 gsap.fromTo(
                     addressRef.current,
@@ -64,7 +89,12 @@ export default function RootLayout({
         });
 
         return () => ctx.revert();
-    }, [hasAnimated]); // ✅ only triggers the first time
+    }, [hasAnimated]);
+
+    // 🔹 Toggle sidebar visibility
+    const toggleSidebar = () => {
+        document.body.classList.toggle("menu-open");
+    };
 
     return (
         <html lang='en'>
@@ -79,32 +109,59 @@ export default function RootLayout({
                             <a href='/'>Ganesh Jewellers</a>
                         </h1>
 
-                        {/* Navigation */}
-                        <nav className='hidden sm:flex space-x-3 md:space-x-5'>
-                            {[
-                                { label: "Home", href: "/" },
-                                { label: "About", href: "/about" },
-                                { label: "Contact", href: "/contact" },
-                                { label: "My Account", href: "/login" },
-                            ].map((nav) => (
+                        {/* Desktop Navigation */}
+                        <nav
+                            ref={navRef}
+                            className='hidden sm:flex space-x-3 md:space-x-5'
+                        >
+                            {navs.map((nav) => (
                                 <a
                                     key={nav.href}
                                     href={nav.href}
                                     className='text-[#e6c78a] font-medium tracking-wide px-4 py-2 rounded-lg 
-          border border-transparent hover:border-[#d6b365] hover:bg-[#fef9f3]/10 
-          hover:text-[#d86d38] transition-all duration-300 ease-in-out'
+                        border border-transparent hover:border-[#d6b365] hover:bg-[#fef9f3]/10 
+                        hover:text-[#d86d38] transition-all duration-300 ease-in-out'
                                 >
                                     {nav.label}
                                 </a>
                             ))}
                         </nav>
 
-                        {/* Mobile Menu Placeholder */}
-                        <button className='sm:hidden text-[#e6c78a] hover:text-[#d86d38] transition'>
+                        {/* Mobile Menu Button */}
+                        <button
+                            onClick={toggleSidebar}
+                            className='sm:hidden text-[#e6c78a] hover:text-[#d86d38] transition text-2xl'
+                        >
                             ☰
                         </button>
                     </div>
                 </header>
+
+                {/* Mobile Sidebar Navigation */}
+                <div
+                    ref={mobileNavRef}
+                    className='mobile-nav fixed top-0 right-0 h-full w-3/4 max-w-sm bg-[#2c1f1b]/95 backdrop-blur-lg 
+                    flex flex-col items-center justify-center space-y-8 text-[#e6c78a] text-lg 
+                    translate-x-full shadow-2xl z-40'
+                >
+                    <button
+                        onClick={toggleSidebar}
+                        className='absolute top-6 right-6 text-3xl hover:text-[#d86d38]'
+                    >
+                        ✕
+                    </button>
+
+                    {navs.map((nav) => (
+                        <a
+                            key={nav.href}
+                            href={nav.href}
+                            onClick={toggleSidebar}
+                            className='hover:text-[#d86d38] transition text-xl'
+                        >
+                            {nav.label}
+                        </a>
+                    ))}
+                </div>
 
                 {/* Page Content */}
                 <main>{children}</main>

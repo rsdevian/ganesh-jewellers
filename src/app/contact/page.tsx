@@ -14,11 +14,12 @@ export default function ContactPage() {
     const containerRef = useRef<HTMLDivElement>(null);
     const headerRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
+    const sendRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
             // Start everything invisible (prevents flicker)
-            gsap.set([headerRef.current, formRef.current], {
+            gsap.set([headerRef.current, formRef.current, sendRef.current], {
                 opacity: 0,
                 y: 40,
             });
@@ -46,6 +47,15 @@ export default function ContactPage() {
                         duration: 0.6,
                     },
                     "-=0.3"
+                )
+                .to(
+                    sendRef.current,
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.6,
+                    },
+                    "-=0.4"
                 );
         }, containerRef);
 
@@ -139,6 +149,7 @@ export default function ContactPage() {
 
                         <div className='flex items-center gap-4'>
                             <button
+                                ref={sendRef}
                                 type='submit'
                                 disabled={status === "sending"}
                                 className={`px-5 py-2 rounded-md font-semibold transition ${
